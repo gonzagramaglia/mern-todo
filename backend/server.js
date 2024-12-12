@@ -1,6 +1,7 @@
 import express from "express";
 import { connectDB } from "./config/db.js";
 import Task from "./models/task.js";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -40,6 +41,24 @@ app.post("/api/todos", async (req, res) => {
     console.error(`Error: ${err.message}`);
     res.status(500).json({ success: false, message: `Server Error` });
     process.exit(1); // 1 = failure, 0 = success
+  }
+});
+
+app.put("/api/todos/:id", async (req, res) => {
+  const { id } = req.params;
+  const todo = req.body;
+  console.log("Hey there 1");
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ success: false, message: "Invalid Todo Id" });
+  }
+
+  try {
+    const updatedTodo = await Task.findByIdAndUpdate(id, todo, { new: true });
+    res.status(200).json({ success: true, data: updatedTodo });
+  } catch (err) {
+    console.log("Error updating todo:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
