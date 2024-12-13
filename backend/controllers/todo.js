@@ -41,7 +41,6 @@ export const createTodo = async (req, res) => {
 export const updateTodo = async (req, res) => {
   const { id } = req.params;
   const todo = req.body;
-  console.log("Hey there :D");
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).json({ success: false, message: "Invalid Todo Id" });
@@ -60,11 +59,15 @@ export const deleteTodo = async (req, res) => {
   const { id } = req.params;
   console.log(`id: ${id}`);
 
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ success: false, message: "Invalid Todo Id" });
+  }
+
   try {
     await Task.findByIdAndDelete(id);
     res.status(200).json({ success: true, message: "Todo deleted" });
   } catch (err) {
     console.log("Error in deleting todos:", err.message);
-    res.status(404).json({ success: false, message: "Todo not found" });
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
