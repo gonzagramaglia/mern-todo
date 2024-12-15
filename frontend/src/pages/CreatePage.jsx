@@ -9,6 +9,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTaskTodos } from "../todos/task";
 
 const CreatePage = () => {
@@ -20,6 +21,7 @@ const CreatePage = () => {
 
   const { createTask } = useTaskTodos();
   const toast = useToast();
+  const navigate = useNavigate();
 
   const handleAddProduct = async () => {
     const { success, message } = await createTask(newTask);
@@ -33,6 +35,8 @@ const CreatePage = () => {
         isClosable: true,
       });
     } else {
+      navigate("/");
+      console.log("something");
       toast({
         title: "Success",
         description: message,
