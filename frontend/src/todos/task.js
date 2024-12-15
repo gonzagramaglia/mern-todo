@@ -28,4 +28,9 @@ export const useTaskTodos = create((set) => ({
       return { success: false, message: error.message };
     }
   },
+  fetchTasks: async () => {
+    const res = await fetch("/api/todos");
+    const data = await res.json();
+    set({ tasks: data.data });
+  },
 }));
