@@ -60,4 +60,27 @@ export const useTaskTodos = create((set) => ({
       return { success: false, message: err.message };
     }
   },
+  updateTask: async (tid, updatedTask) => {
+    try {
+      const res = await fetch(`/api/todos/${tid}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedTask),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update task");
+      }
+      const data = await res.json();
+
+      //update the UI immediately, without needing a refresh
+      set((state) => ({
+        tasks: state.tasks.map((task) => (task._id === tid ? data.data : task)),
+      }));
+      return { success: true, message: data.message };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  },
 }));

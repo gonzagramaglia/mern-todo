@@ -3,21 +3,36 @@ import {
   Heading,
   Image,
   Text,
+  Button,
   HStack,
+  VStack,
   IconButton,
   useColorModeValue,
   useToast,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
 } from "@chakra-ui/react";
 
+import { useState } from "react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useTaskTodos } from "../todos/task";
 
 const TaskCard = ({ task }) => {
+  const [updatedTask, setUpdatedTask] = useState(task);
+
   const textColor = useColorModeValue("gray.600", "gray.200");
   const bg = useColorModeValue("white", "gray.800");
 
-  const { deleteTask } = useTaskTodos();
+  const { deleteTask, updateTask } = useTaskTodos();
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleDeleteTask = async (tid) => {
     const { success, message } = await deleteTask(tid);
@@ -36,6 +51,28 @@ const TaskCard = ({ task }) => {
         description: message,
         status: "success",
         duration: 1500,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleUpdateTask = async (tid, updatedTask) => {
+    const { success, message } = await updateTask(tid, updatedTask);
+    onClose();
+    if (!success) {
+      toast({
+        title: "Error",
+        description: message,
+        status: "error",
+        duration: 2500,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Task updated successfully",
+        status: "success",
+        duration: 2500,
         isClosable: true,
       });
     }
@@ -66,7 +103,11 @@ const TaskCard = ({ task }) => {
             {task.description}
           </Text>
           <HStack spacing="2">
-            <IconButton icon={<EditIcon />} colorScheme="blue" />
+            <IconButton
+              icon={<EditIcon />}
+              onClick={onOpen}
+              colorScheme="blue"
+            />
             <IconButton
               icon={<DeleteIcon />}
               onClick={() => handleDeleteTask(task._id)}
@@ -74,6 +115,65 @@ const TaskCard = ({ task }) => {
             />
           </HStack>
         </Box>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+
+          <ModalContent>
+            <ModalHeader>Update Task</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <VStack spacing={4}>
+                <Input
+                  placeholder="Title"
+                  name="title"
+                  value={updatedTask.title}
+                  onChange={(e) =>
+                    setUpdatedTask({
+                      ...updatedTask,
+                      title: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Description"
+                  name="description"
+                  type="text"
+                  value={updatedTask.description}
+                  onChange={(e) =>
+                    setUpdatedTask({
+                      ...updatedTask,
+                      description: e.target.value,
+                    })
+                  }
+                />
+                <Input
+                  placeholder="Image URL"
+                  name="image"
+                  value={updatedTask.image}
+                  onChange={(e) =>
+                    setUpdatedTask({
+                      ...updatedTask,
+                      image: e.target.value,
+                    })
+                  }
+                />
+              </VStack>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                onClick={() => handleUpdateTask(task._id, updatedTask)}
+              >
+                Update
+              </Button>
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     </>
   );
