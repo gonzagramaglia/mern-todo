@@ -23,13 +23,13 @@ const CreatePage = () => {
 
   const handleAddProduct = async () => {
     const { success, message } = await createTask(newTask);
-    console.log("Success:", success);
-    console.log("Message:", message);
+
     if (!success) {
       toast({
         title: "Error",
         description: message,
         status: "error",
+        duration: 1500,
         isClosable: true,
       });
     } else {
@@ -37,6 +37,7 @@ const CreatePage = () => {
         title: "Success",
         description: message,
         status: "success",
+        duration: 1500,
         isClosable: true,
       });
     }

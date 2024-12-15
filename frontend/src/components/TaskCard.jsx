@@ -6,13 +6,41 @@ import {
   HStack,
   IconButton,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
 
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import { useTaskTodos } from "../todos/task";
 
 const TaskCard = ({ task }) => {
   const textColor = useColorModeValue("gray.600", "gray.200");
   const bg = useColorModeValue("white", "gray.800");
+
+  const { deleteTask } = useTaskTodos();
+  const toast = useToast();
+
+  const handleDeleteTask = async (tid) => {
+    const { success, message } = await deleteTask(tid);
+
+    if (!success) {
+      toast({
+        title: "Error",
+        description: message,
+        duration: 1500,
+        status: "error",
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: message,
+        status: "success",
+        duration: 1500,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <>
       <Box
@@ -39,7 +67,11 @@ const TaskCard = ({ task }) => {
           </Text>
           <HStack spacing="2">
             <IconButton icon={<EditIcon />} colorScheme="blue" />
-            <IconButton icon={<DeleteIcon />} colorScheme="red" />
+            <IconButton
+              icon={<DeleteIcon />}
+              onClick={() => handleDeleteTask(task._id)}
+              colorScheme="red"
+            />
           </HStack>
         </Box>
       </Box>
